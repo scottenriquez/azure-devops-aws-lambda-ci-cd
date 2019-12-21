@@ -105,3 +105,6 @@ dist
 
 # WebStorm
 .idea/
+
+# Lambda build
+build.zip
