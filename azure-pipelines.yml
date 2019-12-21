@@ -18,6 +18,9 @@ steps:
 
 - script: |
     sudo apt-get install awscli
+    aws configure set aws_access_key_id $(AWS_ACCESS_KEY_ID)
+    aws configure set aws_secret_access_key $(AWS_SECRET_KEY_ID)
+  displayName: 'install and configure the AWS CLI'
 
 - script: |
     npm install
@@ -25,7 +28,7 @@ steps:
   displayName: 'npm install and test'
 
 - script: |
-    aws s3 cp cloudformation-stack.json s3://azdo-staging-s3-bucket -a $(AWS_ACCESS_KEY_ID) -s $(AWS_SECRET_KEY_ID)
+    aws s3 cp cloudformation-stack.json s3://azdo-staging-s3-bucket
     zip -r -X build.zip .
-    aws s3 cp build.zip s3://azdo-staging-s3-bucket -a $(AWS_ACCESS_KEY_ID) -s $(AWS_SECRET_KEY_ID)
+    aws s3 cp build.zip s3://azdo-staging-s3-bucket
   displayName: 'upload CloudFormation template and Lambda function ZIP build to staging bucket'
