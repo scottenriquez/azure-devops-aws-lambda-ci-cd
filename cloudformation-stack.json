@@ -4,30 +4,43 @@
     "IAMR4G4WV": {
       "Type": "AWS::IAM::Role",
       "Properties": {
-        "AssumeRolePolicyDocument": ""
-      }
-    },
-    "S3B2DSI5": {
-      "Type": "AWS::S3::Bucket",
-      "Properties": {
-        "Tags": [{"Key": "Environment", "Value": "Test"}]
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        }
       }
     },
     "LF877Z": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
-          "S3Bucket": "S3B2DSI5",
-          "S3Key": "LambdaBuild",
-          "ZipFile": "LambdaBuild.zip"
+          "S3Bucket": "azdo-staging-s3-bucket",
+          "S3Key": "build.zip"
         },
-        "Handler": "handler",
+        "Handler": "index.handler",
         "Runtime": "nodejs12.x",
-        "Role": "IAMR4G4WV",
+        "Role": {
+          "Fn::GetAtt": [
+            "IAMR4G4WV",
+            "Arn"
+          ]
+        },
         "Tags": [{"Key": "Environment", "Value": "Test"}]
       },
       "DependsOn": [
-        "S3B2DSI5", "IAMR4G4WV"
+        "IAMR4G4WV"
       ]
     }
   }
