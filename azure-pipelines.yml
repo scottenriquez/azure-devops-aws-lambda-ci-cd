@@ -35,5 +35,5 @@ steps:
   displayName: 'upload CloudFormation template and Lambda function ZIP build to staging bucket'
 
 - script: |
-    aws cloudformation update-stack --stack-name $(AWS_STACK_NAME) --template-url $(AWS_CLOUDFORMATION_TEMPLATE_S3_URL) --capabilities CAPABILITY_NAMED_IAM
+    aws cloudformation deploy --stack-name azdo-ci-cd --template-file cloudformation-stack.json --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset
   displayName: 'updating CloudFormation stack'
