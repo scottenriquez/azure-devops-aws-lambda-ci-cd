@@ -49,5 +49,5 @@ stages:
               aws s3 cp $(Pipeline.Workspace)/LambdaBuild/a/build.zip s3://azdo-staging-s3-bucket
             displayName: 'upload CloudFormation template and Lambda function ZIP build to staging bucket'
           - script: |
-              aws cloudformation deploy --stack-name $(AWS_STACK_NAME) --template-file $(AWS_CLOUDFORMATION_TEMPLATE_FILE_PATH) --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset
+              aws cloudformation deploy --stack-name $(AWS_STACK_NAME) --template-file $(Pipeline.Workspace)/LambdaBuild/s/cloudformation-stack.json --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset
             displayName: 'updating CloudFormation stack'
