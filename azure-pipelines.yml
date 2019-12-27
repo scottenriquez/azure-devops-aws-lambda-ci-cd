@@ -25,7 +25,7 @@ stages:
       - task: PublishPipelineArtifact@1
         inputs:
           targetPath: '$(Pipeline.Workspace)/LambdaBuild'
-          artifact: 'LambdaBuild'
+          artifact: 'build.zip'
           publishLocation: 'pipeline'
 - stage: DevelopmentDeployment
   dependsOn: Build
