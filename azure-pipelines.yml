@@ -24,6 +24,14 @@ stages:
       runOnce:
         deploy:
           steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '12.x'
+            displayName: 'Install Node.js'
+          - script: |
+              npm install
+              npm test
+            displayName: 'NPM install and test'
           - script: |
               sudo apt-get install awscli
               aws configure set aws_access_key_id $(AWS_ACCESS_KEY_ID)
