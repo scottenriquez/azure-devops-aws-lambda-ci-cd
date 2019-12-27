@@ -24,7 +24,7 @@ stages:
           verbose: true
       - task: PublishPipelineArtifact@1
         inputs:
-          targetPath: '$(Pipeline.Workspace)/LambdaBuild'
+          targetPath: '$(Pipeline.Workspace)'
           artifact: 'LambdaBuild'
           publishLocation: 'pipeline'
 - stage: DevelopmentDeployment
