@@ -14,6 +14,14 @@ stages:
           npm install
           npm test
         displayName: 'NPM install and test'
+      - script: |
+          zip -r -X build.zip .
+        displayName: 'Create Lambda build ZIP'
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
 - stage: DevelopmentDeployment
   jobs:
   - deployment: LambdaDevelopment
@@ -24,14 +32,6 @@ stages:
       runOnce:
         deploy:
           steps:
-          - task: NodeTool@0
-            inputs:
-              versionSpec: '12.x'
-            displayName: 'Install Node.js'
-          - script: |
-              npm install
-              npm test
-            displayName: 'NPM install and test'
           - script: |
               sudo apt-get install awscli
               aws configure set aws_access_key_id $(AWS_ACCESS_KEY_ID)
@@ -40,8 +40,7 @@ stages:
             displayName: 'install and configure AWS CLI'
           - script: |
               aws s3 cp cloudformation-stack.json s3://azdo-staging-s3-bucket
-              zip -r -X build.zip .
-              aws s3 cp build.zip s3://azdo-staging-s3-bucket
+              aws s3 cp $(Build.ArtifactStagingDirectory)/drop/build.zip s3://azdo-staging-s3-bucket
             displayName: 'upload CloudFormation template and Lambda function ZIP build to staging bucket'
           - script: |
               aws cloudformation deploy --stack-name $(AWS_STACK_NAME) --template-file $(AWS_CLOUDFORMATION_TEMPLATE_FILE_PATH) --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset
