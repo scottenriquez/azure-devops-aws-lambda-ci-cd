@@ -14,9 +14,14 @@ stages:
           npm install
           npm test
         displayName: 'NPM install and test'
-      - script: |
-          zip -r -X build.zip .
-        displayName: 'Create Lambda build ZIP'
+      - task: ArchiveFiles@2
+        inputs:
+          rootFolderOrFile: '$(Build.SourcesDirectory)'
+          includeRootFolder: true
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+          replaceExistingArchive: true
+          verbose: true
       - task: PublishBuildArtifacts@1
         inputs:
           PathtoPublish: '$(Build.ArtifactStagingDirectory)'
@@ -39,8 +44,8 @@ stages:
               aws configure set aws_default_region $(AWS_DEFAULT_REGION)
             displayName: 'install and configure AWS CLI'
           - script: |
-              aws s3 cp cloudformation-stack.json s3://azdo-staging-s3-bucket
-              aws s3 cp $(Build.ArtifactStagingDirectory)/drop/build.zip s3://azdo-staging-s3-bucket
+              aws s3 cp $(Build.SourcesDirectory)/cloudformation-stack.json s3://azdo-staging-s3-bucket
+              aws s3 cp $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip s3://azdo-staging-s3-bucket
             displayName: 'upload CloudFormation template and Lambda function ZIP build to staging bucket'
           - script: |
               aws cloudformation deploy --stack-name $(AWS_STACK_NAME) --template-file $(AWS_CLOUDFORMATION_TEMPLATE_FILE_PATH) --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset
