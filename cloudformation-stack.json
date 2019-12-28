@@ -1,7 +1,7 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
   "Resources": {
-    "IAMR4G4WV": {
+    "IAMLambdaRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
@@ -22,7 +22,7 @@
         }
       }
     },
-    "LF877Z": {
+    "LambdaFunction": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
@@ -33,14 +33,13 @@
         "Runtime": "nodejs12.x",
         "Role": {
           "Fn::GetAtt": [
-            "IAMR4G4WV",
+            "IAMLambdaRole",
             "Arn"
           ]
-        },
-        "Tags": [{"Key": "Environment", "Value": "Test"}]
+        }
       },
       "DependsOn": [
-        "IAMR4G4WV"
+        "IAMLambdaRole"
       ]
     }
   }
