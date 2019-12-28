@@ -52,7 +52,7 @@ stages:
               aws cloudformation deploy --stack-name $(AWS_STACK_NAME_DEVELOPMENT) --template-file $(Pipeline.Workspace)/LambdaBuild/s/$(AWS_CLOUDFORMATION_TEMPLATE_FILE_NAME) --tags Environment=Development --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset
             displayName: 'updating CloudFormation stack'
 - stage: TestDeployment
-  dependsOn: Build
+  dependsOn: DevelopmentDeployment
   jobs:
   - deployment: LambdaTest
     pool:
@@ -76,7 +76,7 @@ stages:
               aws cloudformation deploy --stack-name $(AWS_STACK_NAME_TEST) --template-file $(Pipeline.Workspace)/LambdaBuild/s/$(AWS_CLOUDFORMATION_TEMPLATE_FILE_NAME) --tags Environment=Test --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset
             displayName: 'updating CloudFormation stack'
 - stage: ProductionDeployment
-  dependsOn: Build
+  dependsOn: TestDeployment
   jobs:
   - deployment: LambdaProduction
     pool:
