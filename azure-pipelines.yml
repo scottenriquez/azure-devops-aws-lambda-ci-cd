@@ -49,5 +49,53 @@ stages:
               aws s3 cp $(Pipeline.Workspace)/LambdaBuild/a/LambdaBuild.zip s3://$(AWS_S3_STAGING_BUCKET_NAME)
             displayName: 'upload CloudFormation template and Lambda function ZIP build to staging bucket'
           - script: |
-              aws cloudformation deploy --stack-name $(AWS_STACK_NAME) --template-file $(Pipeline.Workspace)/LambdaBuild/s/$(AWS_CLOUDFORMATION_TEMPLATE_FILE_NAME) --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset
+              aws cloudformation deploy --stack-name $(AWS_STACK_NAME_DEVELOPMENT) --template-file $(Pipeline.Workspace)/LambdaBuild/s/$(AWS_CLOUDFORMATION_TEMPLATE_FILE_NAME) --tags Environment=Development --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset
+            displayName: 'updating CloudFormation stack'
+- stage: TestDeployment
+  dependsOn: Build
+  jobs:
+  - deployment: LambdaTest
+    pool:
+      vmImage: 'ubuntu-latest'
+    environment: 'Test'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: |
+              sudo apt-get install awscli
+              aws configure set aws_access_key_id $(AWS_ACCESS_KEY_ID)
+              aws configure set aws_secret_access_key $(AWS_SECRET_KEY_ID)
+              aws configure set aws_default_region $(AWS_DEFAULT_REGION)
+            displayName: 'install and configure AWS CLI'
+          - script: |
+              aws s3 cp $(Pipeline.Workspace)/LambdaBuild/s/$(AWS_CLOUDFORMATION_TEMPLATE_FILE_NAME) s3://$(AWS_S3_STAGING_BUCKET_NAME)
+              aws s3 cp $(Pipeline.Workspace)/LambdaBuild/a/LambdaBuild.zip s3://$(AWS_S3_STAGING_BUCKET_NAME)
+            displayName: 'upload CloudFormation template and Lambda function ZIP build to staging bucket'
+          - script: |
+              aws cloudformation deploy --stack-name $(AWS_STACK_NAME_TEST) --template-file $(Pipeline.Workspace)/LambdaBuild/s/$(AWS_CLOUDFORMATION_TEMPLATE_FILE_NAME) --tags Environment=Test --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset
+            displayName: 'updating CloudFormation stack'
+- stage: ProductionDeployment
+  dependsOn: Build
+  jobs:
+  - deployment: LambdaProduction
+    pool:
+      vmImage: 'ubuntu-latest'
+    environment: 'Production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: |
+              sudo apt-get install awscli
+              aws configure set aws_access_key_id $(AWS_ACCESS_KEY_ID)
+              aws configure set aws_secret_access_key $(AWS_SECRET_KEY_ID)
+              aws configure set aws_default_region $(AWS_DEFAULT_REGION)
+            displayName: 'install and configure AWS CLI'
+          - script: |
+              aws s3 cp $(Pipeline.Workspace)/LambdaBuild/s/$(AWS_CLOUDFORMATION_TEMPLATE_FILE_NAME) s3://$(AWS_S3_STAGING_BUCKET_NAME)
+              aws s3 cp $(Pipeline.Workspace)/LambdaBuild/a/LambdaBuild.zip s3://$(AWS_S3_STAGING_BUCKET_NAME)
+            displayName: 'upload CloudFormation template and Lambda function ZIP build to staging bucket'
+          - script: |
+              aws cloudformation deploy --stack-name $(AWS_STACK_NAME_PRODUCTION) --template-file $(Pipeline.Workspace)/LambdaBuild/s/$(AWS_CLOUDFORMATION_TEMPLATE_FILE_NAME) --tags Environment=Production --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset
             displayName: 'updating CloudFormation stack'
