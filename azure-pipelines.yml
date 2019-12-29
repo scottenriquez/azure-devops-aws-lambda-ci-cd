@@ -76,10 +76,10 @@ stages:
               aws cloudformation deploy --stack-name $(AWS_STACK_NAME_TEST) --template-file $(Pipeline.Workspace)/LambdaBuild/s/$(AWS_CLOUDFORMATION_TEMPLATE_FILE_NAME) --tags Environment=Test --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset
             displayName: 'updating CloudFormation stack'
 - stage: ProductionDeployment
+  condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/master'))
   dependsOn: TestDeployment
   jobs:
   - deployment: LambdaProduction
-    condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/master'))
     pool:
       vmImage: 'ubuntu-latest'
     environment: 'Production'
