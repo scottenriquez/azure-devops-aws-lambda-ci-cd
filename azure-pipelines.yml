@@ -77,9 +77,9 @@ stages:
             displayName: 'updating CloudFormation stack'
 - stage: ProductionDeployment
   dependsOn: TestDeployment
-  condition: and(eq(variables['build.sourceBranch'], 'refs/heads/master'))
   jobs:
   - deployment: LambdaProduction
+    condition: and(eq(variables['build.sourceBranch'], 'refs/heads/master'))
     pool:
       vmImage: 'ubuntu-latest'
     environment: 'Production'
