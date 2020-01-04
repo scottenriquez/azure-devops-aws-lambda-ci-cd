@@ -14,7 +14,7 @@ stages:
           npm install
           npm run lint
           npm test
-        displayName: 'NPM install and test'
+        displayName: 'NPM install, lint, and test'
       - task: ArchiveFiles@2
         inputs:
           rootFolderOrFile: '$(Build.SourcesDirectory)'
