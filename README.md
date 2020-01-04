@@ -211,7 +211,7 @@ Note that I have parameterized certain inputs (i.e. `$(AWS_ACCESS_KEY_ID)`) as b
 Because each stage in the Azure Pipeline spins up a separate virtual machine, files such as the build artifact are not immediately accessible between build stages. In the build stage, a task can be added to publish a pipeline artifact (accessible via the path `$(Pipeline.Workspace)` path) that can be shared between stages.
 ```yaml
 - task: PublishPipelineArtifact@1
-    inputs:
+  inputs:
     targetPath: '$(Pipeline.Workspace)'
     artifact: 'LambdaBuild'
     publishLocation: 'pipeline'
