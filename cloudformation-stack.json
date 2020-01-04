@@ -10,13 +10,9 @@
             {
               "Effect": "Allow",
               "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
+                "Service": ["lambda.amazonaws.com"]
               },
-              "Action": [
-                "sts:AssumeRole"
-              ]
+              "Action": ["sts:AssumeRole"]
             }
           ]
         }
@@ -32,15 +28,10 @@
         "Handler": "index.handler",
         "Runtime": "nodejs12.x",
         "Role": {
-          "Fn::GetAtt": [
-            "IAMLambdaRole",
-            "Arn"
-          ]
+          "Fn::GetAtt": ["IAMLambdaRole", "Arn"]
         }
       },
-      "DependsOn": [
-        "IAMLambdaRole"
-      ]
+      "DependsOn": ["IAMLambdaRole"]
     }
   }
 }
