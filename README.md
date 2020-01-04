@@ -1,11 +1,11 @@
-# Azure DevOps CI/CD Pipeline for AWS Lambda Function
-This project serves as an end-to-end working example for testing, building, linting, and deploying an AWS Lambda Node.js function to multiple environment using AWS CloudFormation, Azure Pipelines and Azure DevOps. The complete source code is located in [this GitHub repository](https://github.com/scottenriquez/azure-devops-aws-lambda-ci-cd "GitHub"), and the build output is pubicly available via [Azure DevOps](https://dev.azure.com/scottenriquez/AWS%20Lambda%20CI-CD/_build?definitionId=1&_a=summary "Azure DevOps build summary").
+# Azure DevOps CI/CD Pipeline for an AWS Lambda Node.js Function
+This project serves as an end-to-end working example for testing, building, linting, and deploying an AWS Lambda Node.js function to multiple environments using AWS CloudFormation, Azure Pipelines, and Azure DevOps. The complete source code is located in [this GitHub repository](https://github.com/scottenriquez/azure-devops-aws-lambda-ci-cd "GitHub"), and the build output is pubicly available via [Azure DevOps](https://dev.azure.com/scottenriquez/AWS%20Lambda%20CI-CD/_build?definitionId=1&_a=summary "Azure DevOps build summary").
 
 ## Setting Up a Git Repository
-Even though I'm using Azure Pipelines for CI/CD instead of Travis CI, you can easily host the code in a Git repository on Azure DevOps or on GitHub. Microsoft's GitHub integration is seamless, so there's no reason not to use it should you choose to host your source code there instead. All of the features like pull request integration and showing build status alongside each commit on GitHub behave exactly like Travis CI. To enable GitHub integration, simply navigate to the Azure DevOps project settings tab, select 'GitHub connections', then follow the wizard to select the GitHub repository to link.
+Even though I'm using Azure Pipelines for CI/CD instead of Travis CI, you can easily host the code in a Git repository on Azure DevOps or on GitHub. Microsoft's GitHub integration is seamless, so there's no reason not to use it should you choose to host your source code there. All of the features like pull request integration and showing build status alongside each commit on GitHub behave exactly like Travis CI. To enable GitHub integration, simply navigate to the Azure DevOps project settings tab, select 'GitHub connections', then follow the wizard to link the repository of your choice. 
 
 ## Creating an NPM Project for the Lambda Function
-A simple `npm init` command will create the `package.json` file and populate relevant metadata for our Lambda function. All dependencies and development dependencies are documented there.
+A simple `npm init` command will create the `package.json` file and populate relevant metadata for the Lambda function. All dependencies and development dependencies are documented there.
 
 ## Implementing a Sample Lambda Function
 In the root of the project, there's a file called `index.js` with the Lambda function logic. For this example, the handler function simply returns a 200 status code with a serialized JSON body.
@@ -17,7 +17,7 @@ exports.handler = async event => ({
 ```
 
 ## Adding Unit Tests and Code Coverage
-We'll need to install a few development dependencies using the command `npm install --save-dev mocha chai nyc`. After these are installed, we can add our first unit test to `test/handler.test.js`:
+First, install a few development dependencies using the command `npm install --save-dev mocha chai nyc`. I've added a unit test in the file `test/handler.test.js`:
 ```javascript
 const mocha = require('mocha');
 const chai = require('chai');
@@ -40,7 +40,7 @@ describe('Handler', async () => {
   });
 });
 ```
-To configure code coverage rules for our CI/CD pipeline, add a `.nycrc` (Istanbul configuration) file to the root of the project. For this example, I've specified 80% across branches (i.e. if statement paths), lines, functions, and statements. You can also whitelist files to apply code coverage rules to with the `include` attribute.
+To configure code coverage rules for the CI/CD pipeline, add a `.nycrc` (Istanbul configuration) file to the root of the project. For this example, I've specified 80% across branches (i.e. if statement paths), lines, functions, and statements. You can also whitelist files to apply code coverage rules with the `include` attribute.
 ```json
 {
   "branches": 80,
@@ -61,7 +61,7 @@ With this in place, wire up everything in the `package.json` with the proper tes
 },
 ...
 ```
-You can verify that everything is configure correctly by running `npm test` to view unit testing results and code coverage reports.
+You can verify that everything is configured correctly by running `npm test` to view unit testing results and code coverage reports.
 
 ## Configuring Code Linting and Styling
 It's important to think of linting and styling as two separate entities. Linting is part of the CI/CD pipeline and serves as static code analysis. This provides feedback on the code that could potentially cause bugs and should cause a failure in the pipeline if issues are found. Styling on the other hand is opinionated and provides readabilty and consistency across the codebase. However, it's not part of the build pipeline itself and should be run locally prior to a commit.
@@ -87,10 +87,10 @@ With this in place, you can add linting and Prettier commands to the `package.js
 },
 ...
 ```
-Though there is no configuration managed in this repository for code styling, note that you can enable an IDE like Visual Studio Code or JetBrains' WebStorm to apply styling rules upon save.
+Though there is no configuration managed in this repository for code styling, note that you can enable an IDE like Visual Studio Code or JetBrains' WebStorm to apply styling rules upon saving a file.
 
 ## Enabling Continuous Integration Using Azure Pipelines
-Via the Azure DevOps web UI, you can directly commit an initial `azure-pipelines.yml` file to the root of the repository and configure the trigger (i.e. commits). Once the NPM scripts are properly set up like above, the build stage can be configured to run the build, unit tests, and linting in a few lines of code.
+Via the Azure DevOps web UI, you can directly commit an initial `azure-pipelines.yml` file to the root of the repository and configure the trigger (i.e. commits). Once the NPM scripts are properly set up like above, the build stage can be configured to install dependencies, run unit tests, and handle linting in a few lines of code. Note that I've added an archive step because Lambda functions are deployed as ZIP files later in the pipeline.
 ```yaml
 stages:
 - stage: Build
@@ -118,7 +118,7 @@ stages:
           replaceExistingArchive: true
           verbose: true
 ```
-Note that for now, there is only one stage in the pipeline, but additional stages will be managed in the same YAML file. The code above spins up a Linux virtual machine, installs Node.js version 12.x, installs the dependencies specified in the `package.json` file, runs ESLint, and finally runs the unit tests. The logs are made available via Azure DevOps, and the virtual machine is destroyed after the build is complete. If an error occurs at any point (i.e lint issue, failed unit test, etc.), the build does not continue.
+For now, there is only one stage in the pipeline, but additional stages will be managed in the same YAML file later. The code above spins up a Linux virtual machine, installs Node.js version 12.x, installs the dependencies specified in the `package.json` file, runs ESLint, and finally runs the unit tests. The logs are made available via Azure DevOps, and the virtual machine is destroyed after the build is complete. If an error occurs at any point (i.e lint issue, failed unit test, etc.), the build does not continue.
 
 ## Configuring Local Azure Pipeline Builds
 As indicated by the nomenclature, Azure Pipelines run in the cloud. It's worth noting that it is possible to host your own build agents if you so choose. Setting it up does take quite a bit of configuration, so for this project I opted to use the cloud-hosted agent instead. Microsoft has [extensive documentation](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/agents?view=azure-devops&tabs=browser "Self-hosted agents") for setting this up, and I've included the Dockerfile in the `dockeragent` directory.
@@ -164,7 +164,7 @@ One of the core goals of this project is to create a complete solution with ever
   }
 }
 ```
-With this file in hand, creating or updating the infrastructure can be done via the command line using the AWS CLI. After generating an access key and secret key, the CLI can be installed and configured with a few commands. Note that I have specified the commands for Ubuntu (apt-get package manager) since that's the virtual machine image that was specified in the Azure Pipelines YAML.
+With this file in hand, creating and/or updating the infrastructure can be done via the command line using the AWS CLI. After generating an access key and secret key, the CLI can be installed and configured with a few commands. Note that I have specified the commands for Ubuntu (apt-get package manager) since that's the virtual machine image that was specified in the Azure Pipelines YAML.
 ```shell script
 sudo apt-get install awscli
 aws configure set aws_access_key_id $(AWS_ACCESS_KEY_ID)
@@ -176,7 +176,7 @@ aws configure set aws_default_region $(AWS_DEFAULT_REGION)
 After the CLI has been configured, the `aws cloudformation deploy` command will create or update the infrastructure specified in the template. I recommend testing this command locally before including it in the build pipeline.
 
 ## Enabling Multi-Stage and Multi-Environment Continuous Deployments 
-With the ability to deploy cloud infrastructure, the build pipeline can now be a full CI/CD one. In the Azure DevOps UI, environments can be created via the project settings. For this project, I created development, test, and production. These will be referenced in the Azure Pipelines YAML script and capture a history of which build deployed which artifact.
+With the ability to deploy cloud infrastructure, the build pipeline can now be a full CI/CD one. In the Azure DevOps UI, environments can be created via the project settings. For this project, I created development, test, and production. These will be referenced in the Azure Pipelines YAML script and capture a history of which build deployed which artifact to the corresponding environment.
 
 Another stage can be added to the YAML script that depends on a successful build:
 ```yaml
