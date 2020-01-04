@@ -41,7 +41,7 @@ describe('Handler', async () => {
 });
 ```
 To configure code coverage rules for our CI/CD pipeline, add a `.nycrc` (Istanbul configuration) file to the root of the project. For this example, I've specified 80% across branches (i.e. if statement paths), lines, functions, and statements. You can also whitelist files to apply code coverage rules to with the `include` attribute.
-```
+```json
 {
   "branches": 80,
   "lines": 80,
@@ -54,13 +54,48 @@ To configure code coverage rules for our CI/CD pipeline, add a `.nycrc` (Istanbu
 ```
 
 With this in place, wire up everything in the `package.json` with the proper test command:
-```
+```json
+...
 "scripts": {
     ...
     "test": "nyc --reporter=text mocha"
     ...
-}
+},
+...
 ```
 You can verify that everything is configure correctly by running `npm test` to view unit testing results and code coverage reports.
 
 ## Configuring Code Linting and Styling
+It's important to think of linting and styling as two separate entities. Linting is part of the CI/CD pipeline and serves as static code analysis. This provides feedback on the code that could potentially cause bugs and should cause a failure in the pipeline if issues are found. Styling on the other hand is opinionated and provides readabilty and consistency across the codebase. However, it's not part of the build pipeline itself and should be run locally prior to a commit.
+
+For configuring ESLint, I used [@wesbos' configuration](https://github.com/wesbos/eslint-config-wesbos "ESLint Setup") as a base using the command `npx install-peerdeps --dev eslint-config-wesbos`. Detailed instructions can be found in his README. This makes the `.eslintrc` config in the root quite clean:
+```json
+{
+  "extends": [
+    "wesbos"
+  ]
+}
+``` 
+
+Given that code styling is quite opinionated, I won't inject any biases here. To install Prettier, use the command `npm install prettier` and add `.prettierrc` and `.prettierignore` files to the root.
+
+With this in place, you can add linting and Prettier commands to the `package.json`:
+```json
+...
+"scripts": {
+  ...
+  "lint": "eslint .",
+  "lint:fix": "eslint . --fix",
+  "format": "prettier --write \"**/*.{js,jsx,json,md}\""
+  ...
+},
+```
+Though there is no configuration managed in this repository for code styling, note that you can enable an IDE like Visual Studio Code or JetBrains' WebStorm to apply styling rules upon save.
+
+## Enabling Continuous Integration Using Azure Pipelines
+
+## Enabling Local Azure Pipeline Builds
+
+## Enabling Infrastructure as Code Using AWS CloudFormation
+
+## Enabling Multi-Stage and Multi-Environments Deployments and Security Checks
