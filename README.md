@@ -1,10 +1,4 @@
----
-title: "Azure DevOps CI/CD Pipeline for an AWS Lambda Node.js Function" 
-date: "2020-02-08T22:12:03.284Z"
-description: "End-to-end working example for testing, building, linting, and deploying an AWS Lambda Node.js function to multiple environments."
----
-
-# Overview 
+## Overview 
 This project serves as an end-to-end working example for testing, building, linting, and deploying an AWS Lambda Node.js function to multiple environments using AWS CloudFormation, Azure Pipelines, and Azure DevOps. The complete source code is located in [this GitHub repository](https://github.com/scottenriquez/azure-devops-aws-lambda-ci-cd "GitHub"), and the build output is publicly available via [Azure DevOps](https://dev.azure.com/scottenriquez/AWS%20Lambda%20CI-CD/_build?definitionId=1&_a=summary "Azure DevOps build summary").
 
 ## Setting Up a Git Repository
